@@ -1,9 +1,3 @@
-
----
-include:
- - docker-compose-traefik.yml
- - docker-compose-authentik.yml
-
 services:
   web:
     build:
@@ -19,9 +13,11 @@ services:
     environment:
       - FLASK_APP=run.py
       - FLASK_DEBUG=0
+    ports:
+      - "5000"
     networks:
       - flowcase-network
-    command: python run.py # --traefik-authentik # --registry-lock https://my-private-locked-registry.example
+    command: python run.py
 
   nginx:
     image: nginx:1.28-alpine
@@ -29,21 +25,12 @@ services:
     restart: unless-stopped
     volumes:
       - flowcase-nginx-data:/etc/nginx/conf.d
+    ports:
+      - "80:80"
     depends_on:
       - web
-    #labels:
-    #  - traefik.enable=true
-    #  - traefik.http.routers.flowcase.rule=Host(`${DOMAIN}`)
-    #  - traefik.http.routers.flowcase.entrypoints=websecure
-    #  - traefik.http.routers.flowcase.tls.certresolver=acme-resolver
-    #  - traefik.http.services.flowcase.loadbalancer.server.port=8031
-    #  # enable middleware to add authentication by authentik
-    #  # - traefik.http.routers.flowcase.middlewares=authentik@file
-    #  - traefik.docker.network=proxy_network
     networks:
       - flowcase-network
-#      - proxy_network
-
 networks:
   flowcase-network:
     driver: bridge
