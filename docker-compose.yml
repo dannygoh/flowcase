@@ -20,7 +20,7 @@ services:
       - FLASK_APP=run.py
       - FLASK_DEBUG=0
     networks:
-      - default_network
+      - flowcase-network
     command: python run.py # --traefik-authentik # --registry-lock https://my-private-locked-registry.example
 
   nginx:
@@ -31,21 +31,21 @@ services:
       - flowcase-nginx-data:/etc/nginx/conf.d
     depends_on:
       - web
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.flowcase.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.flowcase.entrypoints=websecure
-      - traefik.http.routers.flowcase.tls.certresolver=acme-resolver
-      - traefik.http.services.flowcase.loadbalancer.server.port=80
-      # enable middleware to add authentication by authentik
-      # - traefik.http.routers.flowcase.middlewares=authentik@file
-      - traefik.docker.network=proxy_network
+    #labels:
+    #  - traefik.enable=true
+    #  - traefik.http.routers.flowcase.rule=Host(`${DOMAIN}`)
+    #  - traefik.http.routers.flowcase.entrypoints=websecure
+    #  - traefik.http.routers.flowcase.tls.certresolver=acme-resolver
+    #  - traefik.http.services.flowcase.loadbalancer.server.port=8031
+    #  # enable middleware to add authentication by authentik
+    #  # - traefik.http.routers.flowcase.middlewares=authentik@file
+    #  - traefik.docker.network=proxy_network
     networks:
-      - default_network
-      - proxy_network
+      - flowcase-network
+#      - proxy_network
 
 networks:
-  default_network:
+  flowcase-network:
     driver: bridge
 
 volumes:
